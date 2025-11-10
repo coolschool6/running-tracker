@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Run Tracker</title>
+		<!-- Placeholder for project CSS or a framework -->
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<h1>🏃 Daily Run Log</h1>
+
+		<!-- Workout suggestion display -->
+		<div id="suggestion-display" class="suggestion-box"></div>
+
+		<!-- Stats summary -->
+		<aside id="stats-summary" class="stats-box"></aside>
+
+		<!-- Run input form -->
+		<section id="run-input-form">
+			<form id="log-run-form">
+				<div>
+					<label for="date-input">Date</label>
+					<input type="date" id="date-input" name="date" required>
+				</div>
+				<div>
+					<label for="distance-input">Distance</label>
+					<input type="number" id="distance-input" name="distance" step="any" min="0" placeholder="e.g. 5" required>
+				</div>
+				<div>
+					<label for="duration-input">Duration (minutes)</label>
+					<input type="number" id="duration-input" name="duration" step="any" min="0" placeholder="e.g. 30" required>
+				</div>
+				<div>
+					<label for="type-input">Type / Notes</label>
+					<input type="text" id="type-input" name="type" placeholder="e.g. Tempo Run, Intervals">
+				</div>
+				<div>
+					<button type="submit">Log Run</button>
+				</div>
+			</form>
+		</section>
+
+		<!-- Workout list (rendered by script.js) -->
+		<section id="workout-list" aria-live="polite"></section>
+
+		<script src="script.js"></script>
+	</body>
+</html>
