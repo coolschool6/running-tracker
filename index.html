@@ -4,46 +4,208 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Run Tracker</title>
-		<!-- Placeholder for project CSS or a framework -->
+		<!-- Font Awesome Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<!-- App Stylesheet -->
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
-		<h1>🏃 Daily Run Log</h1>
-
-		<!-- Workout suggestion display -->
-		<div id="suggestion-display" class="suggestion-box"></div>
-
-		<!-- Stats summary -->
-		<aside id="stats-summary" class="stats-box"></aside>
-
-		<!-- Run input form -->
-		<section id="run-input-form">
-			<form id="log-run-form">
-				<div>
-					<label for="date-input">Date</label>
-					<input type="date" id="date-input" name="date" required>
+		<div id="app-container">
+			<!-- iOS-Style Status Bar -->
+			<div class="status-bar">
+				<span class="status-time">9:41</span>
+				<div class="status-icons">
+					<i class="fas fa-wifi"></i>
+					<i class="fas fa-battery-three-quarters"></i>
 				</div>
-				<div>
-					<label for="distance-input">Distance</label>
-					<input type="number" id="distance-input" name="distance" step="any" min="0" placeholder="e.g. 5" required>
+			</div>
+			
+			<!-- Edit Workout Modal -->
+			<div id="edit-modal" class="modal">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2><i class="fas fa-edit"></i> Edit Workout</h2>
+						<button class="modal-close" id="close-edit-modal">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<form id="edit-workout-form">
+						<input type="hidden" id="edit-workout-index">
+						<div>
+							<label for="edit-date"><i class="far fa-calendar-alt"></i> Date</label>
+							<input type="date" id="edit-date" name="date" required>
+						</div>
+						<div>
+							<label for="edit-distance"><i class="fas fa-route"></i> Distance (km)</label>
+							<input type="number" id="edit-distance" name="distance" step="any" min="0" required>
+						</div>
+						<div>
+							<label for="edit-duration"><i class="far fa-clock"></i> Duration (min)</label>
+							<input type="number" id="edit-duration" name="duration" step="any" min="0" required>
+						</div>
+						<div>
+							<label for="edit-type"><i class="fas fa-running"></i> Type</label>
+							<input type="text" id="edit-type" name="type" placeholder="e.g. Easy Run" required>
+						</div>
+						<div class="modal-actions">
+							<button type="button" class="btn-secondary" id="cancel-edit">Cancel</button>
+							<button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+						</div>
+					</form>
 				</div>
-				<div>
-					<label for="duration-input">Duration (minutes)</label>
-					<input type="number" id="duration-input" name="duration" step="any" min="0" placeholder="e.g. 30" required>
-				</div>
-				<div>
-					<label for="type-input">Type / Notes</label>
-					<input type="text" id="type-input" name="type" placeholder="e.g. Tempo Run, Intervals">
-				</div>
-				<div>
-					<button type="submit">Log Run</button>
-				</div>
-			</form>
-		</section>
+			</div>
+			
+			<!-- Multi-View Container -->
+			<div id="app-views">
+				<!-- HOME/DASHBOARD VIEW -->
+				<section id="view-home" class="app-view active">
+					<h1>Dashboard</h1>
 
-		<!-- Workout list (rendered by script.js) -->
-		<section id="workout-list" aria-live="polite"></section>
+					<!-- Week Activity Chart -->
+					<div id="week-chart" class="week-chart-container"></div>
 
+					<!-- Workout suggestion display -->
+					<div id="suggestion-display" class="suggestion-box"></div>
+
+					<!-- Stats summary dashboard -->
+					<aside id="stats-summary" class="stats-box"></aside>
+
+					<!-- Quick log form -->
+					<section id="run-input-form">
+						<h2><i class="fas fa-plus-circle"></i> Log a Run</h2>
+						<form id="log-run-form">
+							<div>
+								<label for="date-input"><i class="far fa-calendar-alt"></i> Date</label>
+								<input type="date" id="date-input" name="date" required>
+							</div>
+							<div>
+								<label for="distance-input"><i class="fas fa-route"></i> Distance (km)</label>
+								<input type="number" id="distance-input" name="distance" step="any" min="0" placeholder="e.g. 5.0" required>
+							</div>
+							<div>
+								<label for="duration-input"><i class="far fa-clock"></i> Duration (min)</label>
+								<input type="number" id="duration-input" name="duration" step="any" min="0" placeholder="e.g. 30" required>
+							</div>
+							<div>
+								<label for="type-input"><i class="fas fa-running"></i> Type / Notes</label>
+								<input type="text" id="type-input" name="type" placeholder="e.g. Tempo Run, Intervals, Easy">
+							</div>
+							<div>
+								<button type="submit"><i class="fas fa-check-circle"></i> Log Run</button>
+							</div>
+						</form>
+					</section>
+
+					<!-- Activity Feed -->
+					<section id="workout-list" aria-live="polite">
+						<h3 class="feed-title">Recent Runs</h3>
+						<div id="workout-feed"></div>
+					</section>
+				</section>
+
+				<!-- TRACK/LIVE VIEW -->
+				<section id="view-track" class="app-view">
+					<div class="live-tracking-container">
+						<h1>Live Tracking</h1>
+						<div class="live-metrics">
+							<div class="metric-card">
+								<span class="metric-label">Time</span>
+								<span class="metric-value" id="live-time">00:00:00</span>
+							</div>
+							<div class="metric-card">
+								<span class="metric-label">Distance</span>
+								<span class="metric-value" id="live-distance">0.00 km</span>
+							</div>
+							<div class="metric-card">
+								<span class="metric-label">Pace</span>
+								<span class="metric-value" id="live-pace">--:--</span>
+							</div>
+						</div>
+						<div class="tracking-controls">
+							<button id="btn-start-tracking" class="btn-primary">Start Run</button>
+							<button id="btn-pause-tracking" class="btn-secondary" style="display:none;">Pause</button>
+							<button id="btn-stop-tracking" class="btn-danger" style="display:none;">Finish</button>
+						</div>
+					</div>
+				</section>
+
+				<!-- PROGRESS/CALENDAR VIEW -->
+				<section id="view-progress" class="app-view">
+					<h1>Progress & Calendar</h1>
+					<div id="progress-charts">
+						<div class="chart-container">
+							<h3>Weekly Distance</h3>
+							<canvas id="chart-weekly"></canvas>
+						</div>
+						<div class="calendar-container">
+							<h3>Training Calendar</h3>
+							<div id="training-calendar"></div>
+						</div>
+					</div>
+				</section>
+
+				<!-- PROFILE VIEW -->
+				<section id="view-profile" class="app-view">
+					<h1>Profile</h1>
+					<div class="profile-header">
+						<div class="profile-avatar">👤</div>
+						<h2>Runner Profile</h2>
+					</div>
+					<div id="profile-stats">
+						<h3>Personal Records</h3>
+						<div id="personal-records"></div>
+					</div>
+					<div class="profile-settings">
+						<h3>Settings</h3>
+						<div class="setting-item">
+							<label for="theme-toggle">Dark Mode</label>
+							<input type="checkbox" id="theme-toggle">
+						</div>
+						<div class="setting-item">
+							<label for="unit-toggle">Units</label>
+							<select id="unit-toggle">
+								<option value="metric">Metric (km)</option>
+								<option value="imperial">Imperial (mi)</option>
+							</select>
+						</div>
+					</div>
+					<div class="profile-actions">
+						<h3>Data Management</h3>
+						<button id="btn-export-json" class="export-btn">
+							<i class="fas fa-download"></i>
+							Export as JSON
+						</button>
+						<button id="btn-export-csv" class="export-btn">
+							<i class="fas fa-file-csv"></i>
+							Export as CSV
+						</button>
+					</div>
+				</section>
+			</div>
+
+			<!-- Bottom Navigation Bar (Mobile-First) -->
+			<nav id="bottom-nav" class="bottom-navigation">
+				<button class="nav-item active" data-view="home">
+					<i class="fas fa-home nav-icon"></i>
+					<span class="nav-label">Home</span>
+				</button>
+				<button class="nav-item" data-view="track">
+					<i class="fas fa-map-marker-alt nav-icon"></i>
+					<span class="nav-label">Track</span>
+				</button>
+				<button class="nav-item" data-view="progress">
+					<i class="fas fa-chart-line nav-icon"></i>
+					<span class="nav-label">Progress</span>
+				</button>
+				<button class="nav-item" data-view="profile">
+					<i class="fas fa-user nav-icon"></i>
+					<span class="nav-label">Profile</span>
+				</button>
+			</nav>
+		</div>
+
+		<!-- Chart.js Library -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 		<script src="script.js"></script>
 	</body>
 </html>
